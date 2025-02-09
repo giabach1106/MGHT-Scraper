@@ -1,15 +1,5 @@
 
 #!/usr/bin/env python3
-"""
-mh_scraper.py
-
-Scrapes McGraw-Hill eBook chapters with headless Playwright:
-- Saves each page as PDF
-- Optionally parses headings/paragraphs into JSON
-- Merges pages into a chapter-level PDF
-- If multiple chapters are scraped, merges them all into `all_chapters_merged.pdf`.
-"""
-
 import argparse
 import asyncio
 import os
@@ -69,13 +59,6 @@ BASE_URL = (
 # ------------------------------------------------------------------------------
 
 async def scrape_page_content(html: str) -> Dict:
-    """
-    Parse HTML with BeautifulSoup and extract a minimal set of data:
-     - <h1> text
-     - <h2> text
-     - <p> paragraphs
-    Return a dictionary. Customize as needed.
-    """
     soup = BeautifulSoup(html, "html.parser")
     data = {
         "h1": [h.get_text(strip=True) for h in soup.find_all("h1")],
@@ -92,8 +75,8 @@ async def fetch_chapter_pages(context, chapter_number: int, scrape_json: bool) -
        2) a list of scraped data dicts (if `scrape_json=True`), else empty
     - If the first page is 403/404 => no such chapter => returns empty lists.
     """
-    chapter_3 = f"{chapter_number:03d}"  # e.g. 1 -> "001"
-    chapter_2 = f"{chapter_number:02d}"  # e.g. 1 -> "01"
+    chapter_3 = f"{chapter_number:03d}"  # eg: 1 -> "001"
+    chapter_2 = f"{chapter_number:02d}"  # eg. 1 -> "01"
 
     pdf_files = []
     json_pages_data = []  # each element is a dict with headings, paragraphs, etc.
