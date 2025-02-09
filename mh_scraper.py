@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python3
 import argparse
 import asyncio
@@ -12,13 +11,13 @@ from playwright.async_api import async_playwright, Response
 from PyPDF2 import PdfMerger
 from bs4 import BeautifulSoup
 
-# ------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 # 1) USER: Paste your fresh cookies here
-# ------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 COOKIES = [
     {
         "name": "CloudFront-Key-Pair-Id",
-        "value": "[REPLACE WITH YOUR COOKIE'S VALUE]",
+        "value": "[INSERT YOUR COOKIE HERE]",
         "domain": "epub-factory-cdn.mheducation.com",
         "path": "/",
         "expires": -1,
@@ -28,7 +27,7 @@ COOKIES = [
     },
     {
         "name": "CloudFront-Signature",
-        "value": "[REPLACE WITH YOUR COOKIE'S VALUE]",
+        "value": "[INSERT YOUR COOKIE HERE]",
         "domain": "epub-factory-cdn.mheducation.com",
         "path": "/",
         "expires": -1,
@@ -38,7 +37,7 @@ COOKIES = [
     },
     {
         "name": "CloudFront-Policy",
-        "value": "[REPLACE WITH YOUR COOKIE'S VALUE]",
+        "value": "[INSERT YOUR COOKIE HERE]",
         "domain": "epub-factory-cdn.mheducation.com",
         "path": "/",
         "expires": -1,
@@ -48,15 +47,15 @@ COOKIES = [
     },
 ]
 
-# ------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 # 2) USER: Adjust if your domain / path is different
-# ------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 BASE_URL = (
-    "https://epub-factory-cdn.mheducation.com/publish/sn_abcdef/5/1080mp4/OPS/s9ml/"
+    "https://epub-factory-cdn.mheducation.com/publish/sn_ABC123/5/1080mp4/OPS/s9ml/"
     "chapter{chapter_3digits}/ch{chapter_2digits}_reader_{page}.xhtml"
 )
 
-# ------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 
 async def scrape_page_content(html: str) -> Dict:
     soup = BeautifulSoup(html, "html.parser")
@@ -67,7 +66,6 @@ async def scrape_page_content(html: str) -> Dict:
     }
     return data
 
-
 async def fetch_chapter_pages(context, chapter_number: int, scrape_json: bool) -> Tuple[List[str], List[Dict]]:
     """
     - Loops over pages for `chapter_number`, returning:
@@ -75,14 +73,14 @@ async def fetch_chapter_pages(context, chapter_number: int, scrape_json: bool) -
        2) a list of scraped data dicts (if `scrape_json=True`), else empty
     - If the first page is 403/404 => no such chapter => returns empty lists.
     """
-    chapter_3 = f"{chapter_number:03d}"  # eg: 1 -> "001"
-    chapter_2 = f"{chapter_number:02d}"  # eg. 1 -> "01"
+    chapter_3 = f"{chapter_number:03d}"  # e.g. 1 -> "001"
+    chapter_2 = f"{chapter_number:02d}"  # e.g. 1 -> "01"
 
     pdf_files = []
-    json_pages_data = []  # each element is a dict with headings, paragraphs, etc.
+    json_pages_data = []
     page_index = 0
 
-    # Output folder for pages
+    # Folder for PDF pages
     chapter_folder = f"chapters/{chapter_number}"
     os.makedirs(chapter_folder, exist_ok=True)
 
@@ -110,11 +108,10 @@ async def fetch_chapter_pages(context, chapter_number: int, scrape_json: bool) -
         pdf_files.append(pdf_filename)
         print(f"  -> Saved PDF: {pdf_filename}")
 
-        # 2) Optionally scrape text for JSON
+        # 2) Scrape text for JSON (optional)
         if scrape_json:
             html = await page.content()
             page_data = await scrape_page_content(html)
-            # Attach context info
             page_data["chapter"] = chapter_number
             page_data["page"] = page_index
             json_pages_data.append(page_data)
@@ -124,7 +121,6 @@ async def fetch_chapter_pages(context, chapter_number: int, scrape_json: bool) -
 
     return pdf_files, json_pages_data
 
-
 async def merge_pdfs(pdf_list: List[str], output_path: str):
     """Merge a list of PDFs into one file."""
     merger = PdfMerger()
@@ -132,7 +128,6 @@ async def merge_pdfs(pdf_list: List[str], output_path: str):
         merger.append(pdf)
     merger.write(output_path)
     merger.close()
-
 
 def parse_chapters_arg(chapters_arg: str) -> Tuple[bool, List[int]]:
     """
@@ -162,7 +157,6 @@ def parse_chapters_arg(chapters_arg: str) -> Tuple[bool, List[int]]:
         chapter_nums.append(int(item))
     return False, chapter_nums
 
-
 async def main():
     parser = argparse.ArgumentParser(description="Scrape McGraw-Hill eBook chapters to PDF and optional JSON.")
     parser.add_argument(
@@ -181,13 +175,19 @@ async def main():
         action="store_true",
         help="Run browser in a visible window (for debugging)."
     )
-
     args = parser.parse_args()
+
     is_all, chapters_list = parse_chapters_arg(args.chapters)
     scrape_json = args.json
 
+    # NEW: Create a dedicated folder for JSON files if --json is used
+    json_output_folder = "chapters_json"
+    if scrape_json:
+        os.makedirs(json_output_folder, exist_ok=True)
+
     async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=not args.headful)
+        # Force headless mode for PDF printing
+        browser = await p.chromium.launch(headless=True)
 
         all_merged_pdfs = []
 
@@ -212,9 +212,9 @@ async def main():
                 print(f"✅ Chapter {chapter_num} merged -> {merged_pdf}")
                 all_merged_pdfs.append(merged_pdf)
 
-                # Write JSON if requested
+                # Save JSON into the separate folder
                 if scrape_json and pages_data:
-                    json_path = os.path.join(chapter_folder, f"chapter_{chapter_num}.json")
+                    json_path = os.path.join(json_output_folder, f"chapter_{chapter_num}.json")
                     with open(json_path, "w", encoding="utf-8") as jf:
                         json.dump(pages_data, jf, indent=2)
                     print(f"✅ Chapter {chapter_num} JSON -> {json_path}")
@@ -235,21 +235,21 @@ async def main():
                     print(f"Warning: Chapter {chapter_num} had no valid pages (403/404). Check cookies/URL.")
                     continue
 
-                # Merge
+                # Merge PDF pages for the chapter
                 chapter_folder = f"chapters/{chapter_num}"
                 merged_pdf = os.path.join(chapter_folder, f"chapter_{chapter_num}_merged.pdf")
                 await merge_pdfs(pdf_files, merged_pdf)
                 print(f"✅ Chapter {chapter_num} merged -> {merged_pdf}")
                 all_merged_pdfs.append(merged_pdf)
 
-                # JSON
+                # Save JSON into the separate folder
                 if scrape_json and pages_data:
-                    json_path = os.path.join(chapter_folder, f"chapter_{chapter_num}.json")
+                    json_path = os.path.join(json_output_folder, f"chapter_{chapter_num}.json")
                     with open(json_path, "w", encoding="utf-8") as jf:
                         json.dump(pages_data, jf, indent=2)
                     print(f"✅ Chapter {chapter_num} JSON -> {json_path}")
 
-        # Merge all chapters' PDFs if more than one
+        # Merge all chapters' PDFs into one if more than one chapter was scraped
         if len(all_merged_pdfs) > 1:
             final_merged = "all_chapters_merged.pdf"
             await merge_pdfs(all_merged_pdfs, final_merged)
@@ -258,7 +258,6 @@ async def main():
             print("No multi-chapter merge needed or only one chapter found.")
 
         await browser.close()
-
 
 if __name__ == "__main__":
     asyncio.run(main())

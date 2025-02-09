@@ -32,8 +32,8 @@ It then merges each chapter’s PDFs into one `chapter_{N}_merged.pdf`. If you s
     Install requirements:
    ```bash
    cd MGHT-Scraper
-   python -m venv venv         # optional but recommended
-   source venv/bin/activate    # (Windows: venv\Scripts\activate)
+   python -m venv venv         # optional but recommended, it should be python 3.9 (tested)
+   source venv/bin/activate    # (on Windows: venv\Scripts\activate.bat)
    pip install -r requirements.txt
    playwright install
    ```
@@ -49,9 +49,9 @@ It then merges each chapter’s PDFs into one `chapter_{N}_merged.pdf`. If you s
     * Login and Open your eBook 
     * Open the broswer's DevTools (Ctrl+Shift+I or F12)
     * Navigate to the Networktab and watch while navigating between pages or chapters in the eBook.
-    * Look for a request where the URL includes something like:
+    * Look for a request where the URL starts with "epub-factory-cdn.mheducation.com/publish" and ends with '.xhtml':
     ```bash https://epub-factory-cdn.mheducation.com/publish/sn_abc123/OPS/s9ml/chapter005/ch05_reader_10.xhtml" ```
-    * Replace the numeric parts with placeholders in BASE_URL:
+    * Replace the "sn_######" inside the BASE_URL (or any numeric parts with placeholders with different format):
     
     ```bash
     BASE_URL = (
@@ -61,7 +61,7 @@ It then merges each chapter’s PDFs into one `chapter_{N}_merged.pdf`. If you s
     ```
 3. **When you ready, run this command.**
     ```
-    python mh_scraper.py --chapters all [--json] [--headful]
+    python mh_scraper.py --chapters all --json
     ```
     Options:
     `--chapters all` → scrape from chapter 1 up until no more exist (scrape the whole book).
