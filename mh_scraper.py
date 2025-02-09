@@ -62,7 +62,7 @@ COOKIES = [
 # 2) USER: Adjust if your domain / path is different
 # ------------------------------------------------------------------------------
 BASE_URL = (
-    "https://epub-factory-cdn.mheducation.com/publish/sn_f17359/5/1080mp4/OPS/s9ml/"
+    "https://epub-factory-cdn.mheducation.com/publish/sn_abcdef/5/1080mp4/OPS/s9ml/"
     "chapter{chapter_3digits}/ch{chapter_2digits}_reader_{page}.xhtml"
 )
 

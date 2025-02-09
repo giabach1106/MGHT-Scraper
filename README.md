@@ -25,6 +25,11 @@ It then merges each chapter’s PDFs into one `chapter_{N}_merged.pdf`. If you s
 1. **Python 3.9+** recommended.  
 2. **Clone** or **download** this repo.  
 3. **Install Dependencies**:
+    ```console 
+    user@machine$ git clone https://github.com/giabach1106/MGHT-Scraper.git
+    ```
+
+    Install requirements:
    ```bash
    cd MGHT-Scraper
    python -m venv venv         # optional but recommended
@@ -32,12 +37,27 @@ It then merges each chapter’s PDFs into one `chapter_{N}_merged.pdf`. If you s
    pip install -r requirements.txt
    playwright install
   ```
- ## How to useL
+
+ ## How to use
 1. **Add Fresh Cookies in mh_scraper.py (the COOKIES list)**
-    - Obtain them from your browser’s DevTools while logged in.
-2. **Adjust BASE_URL if your eBook domain or path is different.**
+    * There are 3 cookies that you will need to find: 'CloudFront-Key-Pair-Id, CloudFront-Signature, CloudFront-Policy'
+    * You can get it directly from this link in Chrome or Edge
+    - chrome://settings/content/all?searchSubpage=epub-factory-cdn.mheducation.com
+    - edge://settings/content/cookies/siteData?searchSubpage=epub-factory-cdn.mheducation.com
+    * Or others browser when look for requests to 'epub-factory-cdn.mheducation.com'
+2. **Adjust BASE_URL.**
+    * Login and Open your eBook 
+    * Open the broswer's DevTools (Ctrl+Shift+I or F12)
+    * Navigate to the Networktab and watch while navigating between pages or chapters in the eBook.
+    * Look for a request where the URL includes something like:
+    ```bash https://epub-factory-cdn.mheducation.com/publish/sn_abc123/OPS/s9ml/chapter005/ch05_reader_10.xhtml" ```
+    * Replace the numeric parts with placeholders in BASE_URL:
+    
     ```bash
-  python mh_scraper.py --chapters all [--json] [--headful]
+    BASE_URL = (
+    "https://epub-factory-cdn.mheducation.com/publish/sn_abc123/OPS/s9ml/"
+    "chapter{chapter_3digits}/ch{chapter_2digits}_reader_{page}.xhtml"
+    )
     ```
 3. **When you ready, run this command.**
     ```
@@ -48,15 +68,13 @@ It then merges each chapter’s PDFs into one `chapter_{N}_merged.pdf`. If you s
     `--chapters 3` or `--chapters 1,2,4` or `--chapters 1-5`.
     `--json` → also parse textual data into chapter_{N}.json.
     `--headful` → run Chromium with a visible window (for debugging).
-4. **Examples Usage**
-    ```bash
+4. **Examples Usage** 
     # 1) Scrape all chapters (PDF only)
-    python mh_scraper.py --chapters all
+    `python mh_scraper.py --chapters all`
 
     # 2) Scrape chapters 1 & 2, export JSON as well:
-    python mh_scraper.py --chapters 1,2 --json
+    `python mh_scraper.py --chapters 1,2 --json`
 
     # 3) Scrape chapters 1-3 with a visible browser
-    python mh_scraper.py --chapters 1-3 --headful
-    ```
-5.
+    `python mh_scraper.py --chapters 1-3 --headful`
+   
