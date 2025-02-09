@@ -7,7 +7,7 @@ This Python project uses [Playwright](https://playwright.dev/python/) to:
 
 It then merges each chapter’s PDFs into one `chapter_{N}_merged.pdf`. If you scrape multiple chapters, it can also merge all chapters into **`all_chapters_merged.pdf`**. For JSON, each chapter gets a **`chapter_{N}.json`**.
 
-> **Disclaimer**: Ensure you have permission to save these materials. Respect copyright and the platform’s policies.
+> **Disclaimer**: Please ensure you have the right to save and use these materials. Respect copyright laws and the platform's policies.  You must rent or purchase the book before scraping its content, thereby legally obtaining the right to use it for personal purposes. However, this script should only be used for educational purposes.
 
 ## Features
 
