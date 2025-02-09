@@ -36,7 +36,7 @@ It then merges each chapter’s PDFs into one `chapter_{N}_merged.pdf`. If you s
    source venv/bin/activate    # (Windows: venv\Scripts\activate)
    pip install -r requirements.txt
    playwright install
-  ```
+   ```
 
  ## How to use
 1. **Add Fresh Cookies in mh_scraper.py (the COOKIES list)**
