@@ -69,12 +69,12 @@ It then merges each chapter’s PDFs into one `chapter_{N}_merged.pdf`. If you s
     `--json` → also parse textual data into chapter_{N}.json.
     `--headful` → run Chromium with a visible window (for debugging).
 4. **Examples Usage** 
-    * 1) Scrape all chapters (PDF only)
+    * Scrape all chapters (PDF only)
     `python mh_scraper.py --chapters all`
 
-    * 2) Scrape chapters 1 & 2, export JSON as well:
+    * Scrape chapters 1 & 2, export JSON as well:
     `python mh_scraper.py --chapters 1,2 --json`
 
-    * 3) Scrape chapters 1-3 with a visible browser
+    * Scrape chapters 1-3 with a visible browser
     `python mh_scraper.py --chapters 1-3 --headful`
    
